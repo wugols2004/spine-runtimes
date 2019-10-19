@@ -129,14 +129,18 @@ namespace Spine.Unity.Editor {
 
 			public const float DEFAULT_MIPMAPBIAS = SpinePreferences.DEFAULT_MIPMAPBIAS;
 
-			public const float DEFAULT_SCENE_ICONS_SCALE = SpinePreferences.DEFAULT_SCENE_ICONS_SCALE;
-			public const string SCENE_ICONS_SCALE_KEY = SpinePreferences.SCENE_ICONS_SCALE_KEY;
+			public const string SCENE_ICONS_SCALE_KEY = "SPINE_SCENE_ICONS_SCALE";
+			public static float handleScale = SpinePreferences.DEFAULT_SCENE_ICONS_SCALE;
 
 			const string AUTO_RELOAD_SCENESKELETONS_KEY = "SPINE_AUTO_RELOAD_SCENESKELETONS";
 			public static bool autoReloadSceneSkeletons = SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS;
 
 			const string MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY = "SPINE_MECANIM_EVENT_INCLUDE_FOLDERNAME";
 			public static bool mecanimEventIncludeFolderName = SpinePreferences.DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME;
+
+			const string TIMELINE_USE_BLEND_DURATION_KEY = "SPINE_TIMELINE_USE_BLEND_DURATION_KEY";
+			public static bool timelineUseBlendDuration = SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION;
+
 
 			static bool preferencesLoaded = false;
 
@@ -154,8 +158,8 @@ namespace Spine.Unity.Editor {
 				mecanimEventIncludeFolderName = EditorPrefs.GetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, SpinePreferences.DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME);
 				atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
 				textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
-
-				SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
+				timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
+				handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 				preferencesLoaded = true;
 			}
 
@@ -171,6 +175,8 @@ namespace Spine.Unity.Editor {
 				newPreferences.mecanimEventIncludeFolderName = EditorPrefs.GetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, SpinePreferences.DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME);
 				newPreferences.atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
 				newPreferences.textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
+				newPreferences.timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
+				newPreferences.handleScale = EditorPrefs.GetBool(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 			}
 
 			public static void SaveToEditorPrefs(SpinePreferences preferences) {
@@ -184,6 +190,8 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, preferences.mecanimEventIncludeFolderName);
 				EditorPrefs.SetBool(ATLASTXT_WARNING_KEY, preferences.atlasTxtImportWarning);
 				EditorPrefs.SetBool(TEXTUREIMPORTER_WARNING_KEY, preferences.textureImporterWarning);
+				EditorPrefs.SetBool(TIMELINE_USE_BLEND_DURATION_KEY, preferences.timelineUseBlendDuration);
+				EditorPrefs.SetBool(SCENE_ICONS_SCALE_KEY, preferences.handleScale);
 			}
 #endif
 
@@ -248,10 +256,10 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.LabelField("Handles and Gizmos", EditorStyles.boldLabel);
 				{
 					EditorGUI.BeginChangeCheck();
-					SpineHandles.handleScale = EditorGUILayout.Slider("Editor Bone Scale", SpineHandles.handleScale, 0.01f, 2f);
-					SpineHandles.handleScale = Mathf.Max(0.01f, SpineHandles.handleScale);
+					handleScale = EditorGUILayout.Slider("Editor Bone Scale", handleScale, 0.01f, 2f);
+					handleScale = Mathf.Max(0.01f, handleScale);
 					if (EditorGUI.EndChangeCheck()) {
-						EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, SpineHandles.handleScale);
+						EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, handleScale);
 						SceneView.RepaintAll();
 					}
 				}
@@ -264,6 +272,12 @@ namespace Spine.Unity.Editor {
 						SpineTK2DEditorUtility.EnableTK2D();
 					if (GUILayout.Button("Disable", GUILayout.Width(64)))
 						SpineTK2DEditorUtility.DisableTK2D();
+				}
+
+				GUILayout.Space(20);
+				EditorGUILayout.LabelField("Timeline Extension", EditorStyles.boldLabel);
+				{
+					SpineEditorUtilities.BoolPrefsField(ref timelineUseBlendDuration, TIMELINE_USE_BLEND_DURATION_KEY, new GUIContent("Use Blend Duration", "When enabled, MixDuration will be synced with timeline clip transition duration 'Ease In Duration'."));
 				}
 			}
 		#endif // !NEW_PREFERENCES_SETTINGS_PROVIDER

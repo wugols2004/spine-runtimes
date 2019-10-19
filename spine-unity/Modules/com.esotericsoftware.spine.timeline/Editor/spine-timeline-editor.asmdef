@@ -2,10 +2,14 @@
     "name": "spine-timeline-editor",
     "references": [
         "spine-unity",
-        "spine-timeline"
+        "spine-unity-editor",
+        "spine-timeline",
+        "Unity.Timeline"
     ],
     "optionalUnityReferences": [],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
